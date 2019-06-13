@@ -24,6 +24,23 @@ object Formats {
       Vector(b1.toByte, b2.toByte)
     }
 
+  val uint16: Format[Int] =
+    Format { bytes =>
+      if (bytes.length >= 2) {
+        val b1 = (bytes(0) & 0xFF) << 8
+        val b2 = bytes(1) & 0xFF
+
+        val number = b1 | b2
+        Match(number, bytes.drop(2))
+      } else
+        NoMatch
+    } { number =>
+      val b1 = number >>> 8
+      val b2 = number & 0xFF
+
+      Vector(b1.toByte, b2.toByte)
+    }
+
 
   val beInt: Format[Int] =
     Format { bytes =>
@@ -45,5 +62,10 @@ object Formats {
 
       Vector(b1.toByte, b2.toByte, b3.toByte, b4.toByte)
     }
+
+  //variable-length string
+//  val varStr: Format[String] =
+
+  def varVector[A](sizeInBytes: Int, bytes: TraversableOnce[A])(implicit fromat: Format[A]): Format[TraversableOnce[A]] = ???
 
 }
